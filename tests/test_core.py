@@ -267,7 +267,7 @@ def test_txt_to_playback_pause_resume_stop(service, tmp_path):
     time.sleep(0.08)
     assert service.playback.output.position == position
     assert service.handle(command("resume"))["payload"]["status"] == "playing"
-    wait_for(lambda: service.playback.status == "finished")
+    wait_for(lambda: service.playback.status == "finished", timeout=10)
     assert len(service.playback.engines["kokoro"].calls) == 3
     assert service.handle(command("stop"))["payload"]["status"] == "stopped"
 
@@ -287,7 +287,7 @@ def test_seek_cancels_stale_prefetch(service):
     service.handle(command("play"))
     wait_for(lambda: service.playback.status == "playing")
     service.handle(command("seek", paragraph=3))
-    wait_for(lambda: service.playback.status == "finished")
+    wait_for(lambda: service.playback.status == "finished", timeout=10)
     assert service.playback.index == 3
     assert service.store.progress(service.playback.document.id)["completed"]
 

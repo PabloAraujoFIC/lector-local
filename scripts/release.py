@@ -28,9 +28,44 @@ def checksums():
     print(output)
 
 
+def collect_desktop(signed: bool = False):
+    folder = {"linux": "linux", "win32": "windows", "darwin": "macos"}[sys.platform]
+    suffix = {"linux": ".deb", "win32": ".exe", "darwin": ".dmg"}[sys.platform]
+    output = ROOT / "release/desktop" / folder
+    output.mkdir(parents=True, exist_ok=True)
+    bundles = ROOT / "apps/desktop/src-tauri/target/release/bundle"
+    version = json.loads((ROOT / "package.json").read_text())["version"]
+    architecture = "arm64" if platform.machine().lower() in {"arm64", "aarch64"} else "x64"
+    generated = list(bundles.rglob(f"*{version}*{suffix}"))
+    if not generated:
+        raise RuntimeError("The requested native installer was not generated")
+    for path in generated:
+        target = output / f"lector-local-{version}-{folder}-{architecture}{suffix}"
+        shutil.copy2(path, target)
+    if sys.platform == "linux":
+        with tarfile.open(
+            output / f"lector-local-{version}-linux-{architecture}.tar.gz", "w:gz"
+        ) as archive:
+            archive.add(
+                ROOT / "apps/desktop/src-tauri/target/release/lector-local-desktop",
+                arcname="lector-local/lector-local-desktop",
+            )
+            archive.add(ROOT / "apps/desktop/src-tauri/runtime", arcname="lector-local/core")
+            archive.add(ROOT / "docs/TESTERS.md", arcname="lector-local/TESTERS.md")
+            archive.add(
+                ROOT / "THIRD_PARTY_NOTICES.md", arcname="lector-local/THIRD_PARTY_NOTICES.md"
+            )
+            archive.add(ROOT / "LICENSE", arcname="lector-local/LICENSE")
+    (output / f"STATUS-{platform.machine()}.txt").write_text(
+        ("Native signature verified\n" if signed else "SIGNING_REQUIRED\n")
+        + "Native manual user validation pending.\nModels download with consent on first use.\n"
+    )
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--extensions-only", action="store_true")
+    parser.add_argument("--collect-only", action="store_true")
     parser.add_argument(
         "--skip-checks", action="store_true", help="Only after successful verification"
     )
@@ -46,12 +81,13 @@ def main():
         subprocess.run(command, cwd=ROOT, check=True)
 
     run([sys.executable, "scripts/version.py"])
-    if not args.skip_checks:
-        run([sys.executable, "scripts/verify.py"])
-    run([npm, "run", "build", "--workspace", "@lector/extension"])
-    run([sys.executable, "scripts/check_store.py"])
-    run([sys.executable, "scripts/lint_extension.py"])
-    run([sys.executable, "scripts/package_extensions.py"])
+    if not args.collect_only:
+        if not args.skip_checks:
+            run([sys.executable, "scripts/verify.py"])
+        run([npm, "run", "build", "--workspace", "@lector/extension"])
+        run([sys.executable, "scripts/check_store.py"])
+        run([sys.executable, "scripts/lint_extension.py"])
+        run([sys.executable, "scripts/package_extensions.py"])
     if args.signed:
         required = (
             ["LECTOR_WINDOWS_CERTIFICATE_THUMBPRINT", "LECTOR_WINDOWS_TIMESTAMP_URL"]
@@ -62,7 +98,7 @@ def main():
             not os.environ.get(key) for key in required
         ):
             parser.error("SIGNING_REQUIRED: missing native signing credentials")
-    if not args.extensions_only:
+    if not args.extensions_only and not args.collect_only:
         run([sys.executable, "scripts/package_core.py", *(["--signed"] if args.signed else [])])
         command = [npm, "run", "desktop:build", "--"]
         if sys.platform == "linux":
@@ -95,37 +131,8 @@ def main():
             run(["codesign", "--verify", "--deep", "--strict", str(app)])
             run(["xcrun", "stapler", "validate", str(app)])
             run(["spctl", "--assess", "--type", "execute", str(app)])
-        folder = {"linux": "linux", "win32": "windows", "darwin": "macos"}[sys.platform]
-        suffix = {"linux": ".deb", "win32": ".exe", "darwin": ".dmg"}[sys.platform]
-        output = ROOT / "release/desktop" / folder
-        output.mkdir(parents=True, exist_ok=True)
-        bundles = ROOT / "apps/desktop/src-tauri/target/release/bundle"
-        version = json.loads((ROOT / "package.json").read_text())["version"]
-        architecture = "arm64" if platform.machine().lower() in {"arm64", "aarch64"} else "x64"
-        generated = list(bundles.rglob(f"*{version}*{suffix}"))
-        if not generated:
-            raise RuntimeError("The requested native installer was not generated")
-        for path in generated:
-            target = output / f"lector-local-{version}-{folder}-{architecture}{suffix}"
-            shutil.copy2(path, target)
-        if sys.platform == "linux":
-            with tarfile.open(
-                output / f"lector-local-{version}-linux-{architecture}.tar.gz", "w:gz"
-            ) as archive:
-                archive.add(
-                    ROOT / "apps/desktop/src-tauri/target/release/lector-local-desktop",
-                    arcname="lector-local/lector-local-desktop",
-                )
-                archive.add(ROOT / "apps/desktop/src-tauri/runtime", arcname="lector-local/core")
-                archive.add(ROOT / "docs/TESTERS.md", arcname="lector-local/TESTERS.md")
-                archive.add(
-                    ROOT / "THIRD_PARTY_NOTICES.md", arcname="lector-local/THIRD_PARTY_NOTICES.md"
-                )
-                archive.add(ROOT / "LICENSE", arcname="lector-local/LICENSE")
-        (output / f"STATUS-{platform.machine()}.txt").write_text(
-            ("Native signature verified\n" if args.signed else "SIGNING_REQUIRED\n")
-            + "Native manual user validation pending.\nModels download with consent on first use.\n"
-        )
+    if not args.extensions_only:
+        collect_desktop(args.signed)
     checksums()
 
 
