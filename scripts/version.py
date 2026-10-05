@@ -26,6 +26,15 @@ def main():
         data = json.loads(path.read_text(encoding="utf-8"))
         if args.set:
             data["version"] = version
+            for group in [
+                "dependencies",
+                "devDependencies",
+                "peerDependencies",
+                "optionalDependencies",
+            ]:
+                for name in data.get(group, {}):
+                    if name.startswith("@lector/"):
+                        data[group][name] = version
             path.write_text(json.dumps(data, indent=2) + "\n")
         elif data["version"] != version:
             raise ValueError(f"Versión incoherente: {path}")
