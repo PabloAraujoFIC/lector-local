@@ -76,6 +76,10 @@ def main():
         ],
         check=True,
     )
+    # Keep installers added by a separate architecture fallback in the manifest.
+    subprocess.run(
+        [sys.executable, "scripts/refresh_release_checksums.py", tag], check=True
+    )
 
 
 if __name__ == "__main__":

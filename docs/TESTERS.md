@@ -18,7 +18,7 @@ Enviar el instalador de su sistema y el ZIP de su navegador desde release/. Envi
 
 ## macOS 14 o posterior · Intel / Apple Silicon
 
-1. Usar sólo el DMG correspondiente a su arquitectura, descargado del artefacto CI si se ha generado.
+1. Descargar de la Release el DMG correspondiente a su arquitectura: arm64 para Apple Silicon o x64 para Intel.
 2. Abrir DMG y arrastrar Lector Local a Aplicaciones; iniciar desde allí.
 3. Si el sistema bloquea la entrega unsigned, el tester decide si permite abrirla en Privacidad y seguridad después de verificar origen/checksum. No es una entrega notarizada.
 4. Descargar una voz en Ajustes, instalar extensión y probar. Al quitar la app, retirar sus registros Native Messaging si ya no se usa.
