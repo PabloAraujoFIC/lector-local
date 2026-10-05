@@ -1,6 +1,6 @@
 {
   "name": "lector-local",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "workspaces": [
@@ -13,7 +13,12 @@
     "desktop:build": "npm run tauri --workspace @lector/desktop -- build",
     "typecheck": "tsc --noEmit",
     "lint": "eslint apps packages",
-    "test": "vitest run"
+    "test": "vitest run --maxWorkers=1",
+    "build:extension:firefox": "npm run build --workspace @lector/extension",
+    "build:extension:chrome": "npm run build --workspace @lector/extension",
+    "check:store": "python scripts/check_store.py",
+    "release": "python scripts/release.py",
+    "version:check": "python scripts/version.py"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.0",
@@ -21,12 +26,18 @@
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "@types/webextension-polyfill": "^0.12.3",
+    "addons-linter": "10.13.0",
     "eslint": "^9.39.0",
     "globals": "^16.4.0",
     "jsdom": "^26.1.0",
+    "playwright": "1.63.0",
     "prettier": "^3.9.9",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.46.0",
     "vitest": "^4.1.11"
+  },
+  "engines": {
+    "node": "22.x",
+    "npm": ">=10"
   }
 }

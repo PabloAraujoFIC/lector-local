@@ -24,7 +24,14 @@ models/*
 !models/bundled-assets.json
 .runtime/
 artifacts/
+release/
+web-ext-artifacts/
+*.partial
+*.log
 apps/desktop/src-tauri/binaries/
 native-host/lector-host
 apps/desktop/src-tauri/gen/
 :memory:.ses
+
+apps/desktop/src-tauri/runtime/
+apps/desktop/src-tauri/runtime-windows/

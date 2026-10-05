@@ -1,14 +1,10 @@
-"""Fetch and verify release assets at build time, never on the user's machine."""
+"""Prepare OCR and licenses only. TTS models are never downloaded during builds."""
 
 import hashlib
 import json
 import shutil
-import sys
 import urllib.request
 from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "core"))
-from reader_core.model_manager import BASE, FILES  # noqa: E402
 
 
 def verified(path, record):
@@ -22,10 +18,7 @@ def verified(path, record):
 def prepare(root: Path):
     destination = root / "artifacts/bundled-assets"
     records = json.loads((root / "models/bundled-assets.json").read_text())
-    records += [
-        {"path": f"models/kokoro/{name}", "url": BASE + name, "bytes": size, "sha256": digest}
-        for name, (size, digest) in FILES.items()
-    ]
+    shutil.rmtree(destination / "models", ignore_errors=True)
     for record in records:
         target = destination / record["path"]
         if verified(target, record):

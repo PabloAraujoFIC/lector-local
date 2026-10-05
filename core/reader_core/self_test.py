@@ -1,6 +1,7 @@
 """Validate the shipped executable in empty user storage, with network disabled."""
 
 import json
+import os
 import socket
 import tempfile
 import urllib.request
@@ -17,26 +18,38 @@ def main():
     import pymupdf
 
     from .extractors.registry import extract_pdf
-    from .tts import KokoroEngine, PiperEngine, TTSEngine
+    from .tts import KokoroEngine, PiperEngine
 
     checks = []
     with tempfile.TemporaryDirectory(prefix="lector-offline-") as temporary:
         directory = Path(temporary)
-        engines: list[tuple[str, TTSEngine, str]] = [
+        engines: list[tuple[str, KokoroEngine | PiperEngine, str]] = [
             ("kokoro", KokoroEngine(directory / "models/kokoro"), "ef_dora"),
             ("piper", PiperEngine(directory / "models/piper"), "piper_es"),
         ]
         for name, engine, voice in engines:
-            audio, rate = engine.synthesize(
-                "Hola. Esta aplicación lee en español sin instalar nada más.",
-                voice,
-                "es",
-                1.0,
-                "cpu",
-            )
-            if len(audio) <= rate or not np.isfinite(audio).all() or np.max(np.abs(audio)) < 0.01:
-                raise RuntimeError(f"Audio inválido: {name}")
-            checks.append({"engine": name, "rate": rate, "seconds": len(audio) / rate})
+            supplied = os.environ.get("LECTOR_TEST_MODEL_DIR_ROOT")
+            if supplied:
+                engine.directory = Path(supplied) / name
+                audio, rate = engine.synthesize(
+                    "Lectura local en español.", voice, "es", 1.0, "cpu"
+                )
+                if not np.isfinite(audio).all() or np.max(np.abs(audio)) < 0.01:
+                    raise RuntimeError(f"Audio inválido: {name}")
+                checks.append({"engine": name, "rate": rate, "seconds": len(audio) / rate})
+            else:
+                from .errors import ReaderError
+
+                try:
+                    engine.synthesize("Lectura local.", voice, "es", 1.0, "cpu")
+                except ReaderError as exc:
+                    if exc.code != "model_missing":
+                        raise
+                    checks.append(
+                        {"engine": name, "runtime": "available", "model": "download required"}
+                    )
+                else:
+                    raise RuntimeError("No debe haber modelos incluidos en el instalador")
         with pymupdf.open() as original:
             page = original.new_page()
             page.insert_text((50, 100), "Lectura local de documentos sin Internet", fontsize=24)

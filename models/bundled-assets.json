@@ -1,23 +1,5 @@
 [
   {
-    "path": "models/piper/piper_es.onnx",
-    "url": "https://huggingface.co/rhasspy/piper-voices/resolve/c10ece1aade47bb51c153c893d14e5bf8e5b7117/es/es_ES/sharvard/medium/es_ES-sharvard-medium.onnx",
-    "bytes": 76733615,
-    "sha256": "40febfb1679c69a4505ff311dc136e121e3419a13a290ef264fdf43ddedd0fb1"
-  },
-  {
-    "path": "models/piper/piper_es.onnx.json",
-    "url": "https://huggingface.co/rhasspy/piper-voices/resolve/c10ece1aade47bb51c153c893d14e5bf8e5b7117/es/es_ES/sharvard/medium/es_ES-sharvard-medium.onnx.json",
-    "bytes": 4903,
-    "sha256": "7438c9b699c72b0c3388dae1b68d3f364dc66a2150fe554a1c11f03372957b2c"
-  },
-  {
-    "path": "models/piper/MODEL_CARD",
-    "url": "https://huggingface.co/rhasspy/piper-voices/resolve/c10ece1aade47bb51c153c893d14e5bf8e5b7117/es/es_ES/sharvard/medium/MODEL_CARD",
-    "bytes": 392,
-    "sha256": "37655314d08fe8a0900abc628d3bcbee48ffbdd8fad9306b89525a0ada20fefc"
-  },
-  {
     "path": "tessdata/spa.traineddata",
     "url": "https://raw.githubusercontent.com/tesseract-ocr/tessdata_fast/4.1.0/spa.traineddata",
     "bytes": 2294433,

@@ -18,8 +18,8 @@ export function PrivacyView({
         <Privacy />
         <p>
           No enviamos documentos, texto, audio ni estadísticas. No hay cuentas
-          ni servicios de voz externos. Los motores y modelos vienen incluidos;
-          puedes leer sin conexión desde el primer uso.
+          ni servicios de voz externos. Los motores vienen incluidos. Descarga
+          una voz desde Ajustes una vez; después puedes leer sin conexión.
         </p>
         <p>
           Las descargas de modelos solo se realizan cuando las solicitas. El

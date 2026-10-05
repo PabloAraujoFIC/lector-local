@@ -1,0 +1,11 @@
+{
+  "nativeHost": "org.lector.local",
+  "firefoxId": "lector-local@lector.local",
+  "development": {
+    "chromiumId": "blnbkkfpidfmgbomijjdofgjpjhjgeob",
+    "chromiumKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtUzbms3K7UDW/DiOuGlmF/0lJTc/1I9mFTG82iKDioew7NY1a/Q9i5KaaEv+QlFtJMzOgpfEVx7+txX+5XKZRVnWKGuSwQVukj8l1/gpBOJwJcYhAhn4NVth8WozVZXiZtWSaBRrklcdrYvMmPlSY7aZhzsKkXIAdFEyO7j+K5K0EmUlMjmhXmvqO9sKek4ejFEOoJBQtHyFdNOvB2YdgidL8JozhdPmKJXcJ/W2Dk/6CDpr0e6o4iYnkQFcbwLx6J9gJTh0NIk/kS1dfm4mnOE95U4YBBXszuOp2HRZ6HknbCTpDlbQXAyYguLjpWO11iSj2uQKcoGNBIAUK+767QIDAQAB"
+  },
+  "production": {
+    "chromiumId": null
+  }
+}

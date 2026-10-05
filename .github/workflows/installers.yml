@@ -1,6 +1,10 @@
-name: Native installers for manual testing
+name: Native installers and store packages
 on:
   workflow_dispatch:
+  push:
+    tags: ['v*']
+permissions:
+  contents: read
 jobs:
   build:
     strategy:
@@ -16,8 +20,6 @@ jobs:
           - os: ubuntu-22.04
             label: linux-x64
     runs-on: ${{ matrix.os }}
-    permissions:
-      contents: read
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -28,17 +30,19 @@ jobs:
         with:
           version: '0.12.23'
       - uses: dtolnay/rust-toolchain@stable
-      - name: Linux native dependencies
+      - name: Linux system libraries
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y libwebkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev patchelf libasound2-dev portaudio19-dev
       - run: uv sync --extra dev --python 3.12 --frozen
       - run: npm ci
-      - run: uv run --extra dev python scripts/verify.py
-      - name: Native core and installer
-        run: uv run --extra dev python scripts/build_release.py
+      - name: Build, verify, and package unsigned
+        run: uv run --extra dev python scripts/release.py
+      - name: Rebuild AMO source and compare
+        if: runner.os == 'Linux'
+        run: uv run --extra dev python scripts/check_firefox_source.py
       - uses: actions/upload-artifact@v4
         with:
-          name: lector-local-${{ matrix.label }}-unsigned
-          path: artifacts/releases/*
+          name: lector-local-${{ matrix.label }}-SIGNING_REQUIRED
+          path: release/
           if-no-files-found: error
           retention-days: 30

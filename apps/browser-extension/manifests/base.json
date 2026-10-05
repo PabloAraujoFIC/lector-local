@@ -1,0 +1,9 @@
+{
+  "manifest_version": 3,
+  "name": "Lector Local",
+  "description": "Escucha selecciones y artículos con el motor TTS de tu dispositivo.",
+  "permissions": ["contextMenus", "activeTab", "scripting", "nativeMessaging"],
+  "icons": {"16": "icons/16.png", "32": "icons/32.png", "48": "icons/48.png", "128": "icons/128.png"},
+  "action": {"default_popup": "popup.html", "default_title": "Lector Local", "default_icon": {"16": "icons/16.png", "32": "icons/32.png"}},
+  "content_security_policy": {"extension_pages": "script-src 'self'; object-src 'none'"}
+}

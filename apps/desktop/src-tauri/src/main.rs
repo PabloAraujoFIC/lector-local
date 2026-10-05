@@ -2,19 +2,33 @@
 use std::io::Write;
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
+use tauri::Manager;
 
-fn core_process(mode: &str) -> Command {
-    let sidecar = std::env::current_exe()
-        .unwrap()
+fn core_process(app: &tauri::AppHandle, mode: &str) -> Command {
+    let name = if cfg!(windows) {
+        "lector-core.exe"
+    } else {
+        "lector-core"
+    };
+    let resources = app
+        .path()
+        .resource_dir()
+        .unwrap_or_default()
+        .join("core")
+        .join(name);
+    let portable = std::env::current_exe()
+        .unwrap_or_default()
         .parent()
-        .unwrap()
-        .join(if cfg!(windows) {
-            "lector-core.exe"
-        } else {
-            "lector-core"
-        });
+        .unwrap_or(std::path::Path::new("."))
+        .join("core")
+        .join(name);
+    let sidecar = if resources.is_file() {
+        resources
+    } else {
+        portable
+    };
     let mut command;
-    if !cfg!(debug_assertions) && sidecar.is_file() {
+    if !cfg!(debug_assertions) {
         command = Command::new(sidecar);
     } else {
         let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../..");
@@ -37,13 +51,16 @@ fn core_process(mode: &str) -> Command {
 }
 
 #[tauri::command]
-async fn core_request(message: serde_json::Value) -> Result<serde_json::Value, String> {
+async fn core_request(
+    app: tauri::AppHandle,
+    message: serde_json::Value,
+) -> Result<serde_json::Value, String> {
     tauri::async_runtime::spawn_blocking(move || {
         let data = serde_json::to_vec(&message).map_err(|_| "Mensaje inválido.")?;
         if data.len() > 900_000 {
             return Err("Mensaje demasiado grande.".to_string());
         }
-        let mut child = core_process("request")
+        let mut child = core_process(&app, "request")
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
             .stderr(Stdio::null())
@@ -66,9 +83,14 @@ async fn core_request(message: serde_json::Value) -> Result<serde_json::Value, S
 }
 
 #[tauri::command]
-async fn install_model() -> Result<(), String> {
-    tauri::async_runtime::spawn_blocking(|| {
-        let output = core_process("install-model")
+async fn install_model(app: tauri::AppHandle, engine: String) -> Result<(), String> {
+    if engine != "kokoro" && engine != "piper" {
+        return Err("Motor desconocido.".into());
+    }
+    tauri::async_runtime::spawn_blocking(move || {
+        let output = core_process(&app, "install-model")
+            .arg("--engine")
+            .arg(engine)
             .arg("--accept")
             .stdin(Stdio::null())
             .stdout(Stdio::null())
@@ -89,7 +111,11 @@ async fn install_model() -> Result<(), String> {
 }
 
 #[tauri::command]
-async fn register_host(chromium_id: String, firefox_only: bool) -> Result<(), String> {
+async fn register_host(
+    app: tauri::AppHandle,
+    chromium_id: String,
+    firefox_only: bool,
+) -> Result<(), String> {
     if !firefox_only
         && (chromium_id.len() != 32
             || !chromium_id
@@ -102,7 +128,7 @@ async fn register_host(chromium_id: String, firefox_only: bool) -> Result<(), St
         );
     }
     tauri::async_runtime::spawn_blocking(move || {
-        let mut command = core_process("install-host");
+        let mut command = core_process(&app, "install-host");
         if firefox_only { command.arg("--browser").arg("firefox"); }
         else { command.arg("--chromium-id").arg(chromium_id); }
         let status = command.stdin(Stdio::null()).stdout(Stdio::null()).stderr(Stdio::null()).status().map_err(|_| "No se pudo iniciar el registro del host.")?;
@@ -112,6 +138,19 @@ async fn register_host(chromium_id: String, firefox_only: bool) -> Result<(), St
 
 fn main() {
     tauri::Builder::default()
+        .setup(|app| {
+            let handle = app.handle().clone();
+            tauri::async_runtime::spawn_blocking(move || {
+                let _ = core_process(&handle, "install-host")
+                    .arg("--channel")
+                    .arg("production")
+                    .stdin(Stdio::null())
+                    .stdout(Stdio::null())
+                    .stderr(Stdio::null())
+                    .status();
+            });
+            Ok(())
+        })
         .plugin(tauri_plugin_dialog::init())
         .invoke_handler(tauri::generate_handler![
             core_request,

@@ -2,7 +2,7 @@ import re
 import unicodedata
 from dataclasses import dataclass
 
-NORMALIZATION_VERSION = 1
+NORMALIZATION_VERSION = 2
 
 
 @dataclass(frozen=True)
@@ -61,7 +61,9 @@ def chunk_paragraphs(paragraphs: list[Paragraph], maximum: int = 240) -> list[Ch
         text = paragraph.text
         start = 0
         while start < len(text):
-            limit = min(start + maximum, len(text))
+            # The first chunk starts audio sooner; subsequent chunks retain throughput.
+            budget = min(maximum, 100) if not result else maximum
+            limit = min(start + budget, len(text))
             if limit < len(text):
                 endings = [end for _, end in sentences(text[start:limit]) if end < limit - start]
                 if endings:

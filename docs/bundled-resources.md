@@ -1,14 +1,11 @@
 # Recursos incluidos
 
-Los instaladores incluyen Python, los dos motores y sus bibliotecas, modelos y
-fonemizadores. Las descargas ocurren durante la compilación; cada recurso se
-verifica mediante tamaño y SHA-256. La lectura no necesita conexión ni paquetes
-instalados por el usuario. Los modelos importados completos tienen prioridad.
+Los instaladores incluyen Python, motores, fonemizadores y OCR. Los pesos TTS no se descargan durante la compilación ni se incluyen. La aplicación los descarga desde Ajustes con consentimiento, HTTPS y verificación SHA-256. Después, la lectura funciona sin conexión.
 
 - Kokoro-82M v1.0 y voces: https://huggingface.co/hexgrad/Kokoro-82M,
   Apache-2.0; texto de licencia en `licenses/Kokoro-Apache-2.0.txt`.
 - Piper: https://github.com/OHF-Voice/piper1-gpl, GPL-3.0;
-  texto en `licenses/Piper-GPL-3.0.txt`. La distribución incluye los metadatos
+  texto en `licenses/Piper-GPL-3.0.txt`. La distribución del motor incluye los metadatos
   y avisos del paquete y eSpeak. Código fuente del motor: el tag v1.8.0 del
   repositorio anterior; las versiones exactas están en `uv.lock`.
 - Voz Piper española: `es_ES-sharvard-medium`, sin modificar salvo renombrar

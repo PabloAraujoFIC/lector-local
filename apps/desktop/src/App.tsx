@@ -166,12 +166,17 @@ export default function App() {
       setError((e as Error).message);
     }
   };
-  const install = async () => {
+  const install = async (engine: "kokoro" | "piper") => {
     setBusy(true);
     setError("");
     try {
-      await invoke("install_model");
+      await invoke("install_model", { engine });
       setModels(await send<Models>("models"));
+      await update({
+        engine,
+        voice: engine === "piper" ? "piper_es" : "ef_dora",
+        language: "es",
+      });
     } catch (e) {
       setError(String(e));
     } finally {

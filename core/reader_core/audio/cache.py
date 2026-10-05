@@ -29,6 +29,7 @@ class AudioCache:
         self.path = path
         self.path.mkdir(parents=True, exist_ok=True)
         self.lock = threading.RLock()
+        self._fingerprints: dict[tuple, str] = {}
 
     def get(self, key: str):
         with self.lock:
@@ -50,6 +51,8 @@ class AudioCache:
             sf.write(temporary, audio, rate, format="WAV", subtype="PCM_16")
             temporary.replace(path)
             self.trim(limit_mb, protected=path)
+            if path.exists() and path.stat().st_size > limit_mb * 1024 * 1024:
+                path.unlink()  # One oversized chunk must not exceed the configured limit.
 
     def trim(self, limit_mb: int, protected: Path | None = None):
         with self.lock:
@@ -72,13 +75,14 @@ class AudioCache:
             return sum(p.stat().st_size for p in self.path.glob("*.wav"))
 
     def fingerprint(self, paths: list[Path]) -> str:
-        return hashlib.sha256(
-            json.dumps(
-                [
-                    (str(p), p.stat().st_size, p.stat().st_mtime_ns)
-                    if p.exists()
-                    else (str(p), 0, 0)
-                    for p in paths
-                ]
-            ).encode()
-        ).hexdigest()
+        paths = sorted(paths, key=lambda p: p.name)
+        signature = tuple((str(p), p.stat().st_size, p.stat().st_mtime_ns) for p in paths)
+        with self.lock:
+            if signature not in self._fingerprints:
+                digest = hashlib.sha256()
+                for path in paths:
+                    digest.update(path.name.encode())
+                    with path.open("rb") as stream:
+                        digest.update(hashlib.file_digest(stream, "sha256").digest())
+                self._fingerprints = {signature: digest.hexdigest()}
+            return self._fingerprints[signature]

@@ -5,7 +5,7 @@ import { send } from "./client";
 interface Props {
   models: Models | null;
   busy: boolean;
-  install: () => Promise<void>;
+  install: (engine: "kokoro" | "piper") => Promise<void>;
   settings: Settings | undefined;
   update: (values: Partial<Settings>) => Promise<void>;
   setModels: (value: Models) => void;
@@ -28,7 +28,11 @@ export function SettingsView({
       </h1>
       <div className="settings-card">
         <h2>Motor de voz local</h2>
-        <p>Kokoro y Piper funcionan con los modelos incluidos, sin conexión.</p>
+        <p>
+          Descarga una voz una vez. Después, Kokoro y Piper leen sin conexión.
+          Al pulsar Descargar aceptas conectar con GitHub (Kokoro) o Hugging
+          Face (Piper). Los archivos se verifican con SHA-256.
+        </p>
         <p className="model-state">
           {models?.kokoro.installed ? (
             <>
@@ -41,16 +45,21 @@ export function SettingsView({
         </p>
         <p className="model-state">
           {models?.piper.installed
-            ? "Piper · voz española incluida"
-            : "Comprobando la voz de Piper…"}
+            ? "Piper · voz española disponible"
+            : "Piper aún no descargado"}
         </p>
         {!models?.kokoro.installed && (
           <button
             className="primary"
             disabled={busy || models?.kokoro.installed}
-            onClick={() => void install()}
+            onClick={() => void install("kokoro")}
           >
             {busy ? "Descargando y verificando…" : "Descargar Kokoro · 354 MB"}
+          </button>
+        )}
+        {!models?.piper.installed && (
+          <button disabled={busy} onClick={() => void install("piper")}>
+            {busy ? "Descargando y verificando…" : "Descargar Piper · 77 MB"}
           </button>
         )}
         <p className="path">

@@ -8,7 +8,7 @@ from ..resources import model_directory
 
 
 class PiperEngine:
-    """Bundled Spanish voice; complete user imports may override the shipped model."""
+    """Spanish voice downloaded explicitly through the desktop model manager."""
 
     identity = "piper-local-v1"
 
@@ -19,6 +19,9 @@ class PiperEngine:
         self.model: Any = None
 
     def synthesize(self, text: str, voice: str, language: str, speed: float, device: str):
+        import onnxruntime as ort
+
+        ort.disable_telemetry_events()
         try:
             from piper import PiperVoice, SynthesisConfig
         except ImportError:
@@ -28,9 +31,7 @@ class PiperEngine:
             ) from None
         path = self.directory / "piper_es.onnx"
         if not path.is_file() or not path.with_suffix(".onnx.json").is_file():
-            raise ReaderError(
-                "model_missing", "Falta la voz incluida de Piper. Reinstala la aplicación."
-            )
+            raise ReaderError("model_missing", "Descarga la voz española de Piper desde Ajustes.")
         if self.model is None:
             self.model = PiperVoice.load(str(path), use_cuda=False)
         samples = list(

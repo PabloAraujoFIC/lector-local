@@ -1,19 +1,25 @@
 {
   "bundle": {
-    "targets": ["nsis"],
-    "resources": {
-      "../../../artifacts/windows/core/lector-core/_internal/": "_internal/",
-      "../../../installers/windows/Microsoft-Visual-C++-License.rtf": "licenses/Microsoft-Visual-C++-License.rtf"
-    },
+    "targets": [
+      "nsis"
+    ],
     "windows": {
-      "webviewInstallMode": { "type": "offlineInstaller" },
+      "webviewInstallMode": {
+        "type": "offlineInstaller"
+      },
       "nsis": {
         "compression": "zlib",
         "installMode": "currentUser",
         "installerHooks": "windows/hooks.nsh",
-        "languages": ["Spanish", "English"],
+        "languages": [
+          "Spanish",
+          "English"
+        ],
         "displayLanguageSelector": true
       }
+    },
+    "resources": {
+      "runtime-windows/": "core/"
     }
   }
 }

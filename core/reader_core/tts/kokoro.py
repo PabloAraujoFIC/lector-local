@@ -18,11 +18,13 @@ class KokoroEngine:
         self.model: Any = None
         self.device = "cpu"
         self.requested: str | None = None
+        self.telemetry_disabled = False
 
     def _load(self, device: str):
         import onnxruntime as ort
 
         ort.disable_telemetry_events()
+        self.telemetry_disabled = True
         from kokoro_onnx import Kokoro
 
         model = self.directory / "kokoro-v1.0.onnx"
@@ -60,6 +62,9 @@ class KokoroEngine:
         self.requested = device
 
     def synthesize(self, text: str, voice: str, language: str, speed: float, device: str):
+        self.directory = model_directory(
+            self.directory, "kokoro", ("kokoro-v1.0.onnx", "voices-v1.0.bin")
+        )
         if self.model is None or self.requested != device:
             self._load(device)
         assert self.model is not None

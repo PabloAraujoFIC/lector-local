@@ -51,7 +51,6 @@ def main():
         )
     if args.target and args.target != native_target:
         parser.error("PyInstaller requiere construir el core en el SO y arquitectura de destino")
-    target = native_target
     runtime_args = []
     if args.windows_runtime:
         if sys.platform != "win32":
@@ -75,8 +74,18 @@ def main():
             "PyInstaller",
             "--noconfirm",
             *signing,
-            "--onedir" if sys.platform == "win32" else "--onefile",
+            "--onedir",
             *runtime_args,
+            "--exclude-module",
+            "piper.train",
+            "--exclude-module",
+            "onnxruntime.transformers",
+            "--exclude-module",
+            "onnxruntime.quantization",
+            "--add-data",
+            str(root / "core/reader_core/distribution.json") + os.pathsep + "reader_core",
+            "--add-data",
+            str(root / "core/reader_core/model_catalog.json") + os.pathsep + "reader_core",
             "--name",
             "lector-core",
             "--paths",
@@ -124,9 +133,7 @@ def main():
     import shutil
 
     suffix = ".exe" if sys.platform == "win32" else ""
-    executable = output / (
-        "core/lector-core/lector-core.exe" if sys.platform == "win32" else "core/lector-core"
-    )
+    executable = output / "core/lector-core" / ("lector-core" + suffix)
     subprocess.run([str(executable), "self-test"], check=True)
     if args.signed and sys.platform == "win32":
         subprocess.run(
@@ -137,9 +144,13 @@ def main():
             ],
             check=True,
         )
-    destination = root / f"apps/desktop/src-tauri/binaries/lector-core-{target}{suffix}"
-    destination.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(executable, destination)
+    destination = root / (
+        "apps/desktop/src-tauri/runtime-windows"
+        if sys.platform == "win32"
+        else "apps/desktop/src-tauri/runtime"
+    )
+    shutil.rmtree(destination, ignore_errors=True)
+    shutil.copytree(executable.parent, destination)
     print(destination)
 
 

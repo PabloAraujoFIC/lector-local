@@ -6,8 +6,8 @@ import zipfile
 import numpy as np
 import pymupdf
 import pytest
+from helpers import SilentOutput
 from reader_core.audio.cache import AudioCache, cache_key
-from reader_core.audio.output import SilentOutput
 from reader_core.documents import from_text
 from reader_core.errors import ReaderError
 from reader_core.extractors.registry import extract, html_text

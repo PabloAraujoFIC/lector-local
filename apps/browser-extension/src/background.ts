@@ -6,7 +6,8 @@ import {
   type State,
 } from "@lector/types";
 
-const HOST = "org.lector.local";
+declare const __NATIVE_HOST__: string;
+const HOST = __NATIVE_HOST__;
 let port: ReturnType<typeof browser.runtime.connectNative> | null = null;
 let state: State | null = null;
 let lastError = "";
@@ -26,6 +27,7 @@ function connect() {
   port = browser.runtime.connectNative(HOST);
   const nativePort = port;
   port.onMessage.addListener((message) => {
+    if (!message || typeof message !== "object") return;
     const response = message as Response<State> & { event?: string };
     if (response.protocol_version !== 1) {
       lastError = "Host incompatible: actualiza Lector Local.";
@@ -58,7 +60,11 @@ function connect() {
         void browser.tabs
           .sendMessage(activeTab, {
             kind: "highlight",
-            paragraph_id: state.paragraph_id,
+            paragraph_id: ["stopped", "finished", "error"].includes(
+              state.status,
+            )
+              ? null
+              : state.paragraph_id,
             autoscroll: state.settings.autoscroll,
           })
           .catch(() => {});
@@ -73,6 +79,7 @@ function connect() {
   port.onDisconnect.addListener(() => {
     const detail =
       nativePort.error?.message ??
+      browser.runtime.lastError?.message ??
       "Host local desconectado. Instala o registra Lector Local.";
     lastError =
       /No such native application|Specified native messaging host not found/i.test(
@@ -81,6 +88,8 @@ function connect() {
         ? "No se encuentra el motor local de Lector Local. Abre la aplicación de escritorio → Ajustes → Escucha desde tu navegador y registra el host. En Zen usa Registrar Firefox. Después pulsa Reintentar conexión."
         : detail;
     port = null;
+    state = null;
+    readingDocument = undefined;
     for (const item of pending.values()) {
       clearTimeout(item.timer);
       item.reject(new Error(lastError));
@@ -104,6 +113,7 @@ async function dispatch(message: Request): Promise<Response<unknown>> {
     } catch (error) {
       clearTimeout(timer);
       pending.delete(message.id);
+      pendingSpeak.delete(message.id);
       reject(error as Error);
     }
   });
@@ -192,6 +202,11 @@ browser.contextMenus.onClicked.addListener((info, tab) => {
 });
 browser.runtime.onMessage.addListener(
   (message: unknown, sender: browser.Runtime.MessageSender) => {
+    if (!message || typeof message !== "object")
+      return Promise.resolve({
+        success: false,
+        error: { message: "Mensaje inválido." },
+      });
     const msg = message as {
       kind: string;
       request?: Request;

@@ -96,6 +96,7 @@ if (!document.documentElement.hasAttribute(marker)) {
     button.style.display = "none";
   });
   browser.runtime.onMessage.addListener((message: unknown) => {
+    if (!message || typeof message !== "object") return undefined;
     const msg = message as {
       kind: string;
       floating?: boolean;

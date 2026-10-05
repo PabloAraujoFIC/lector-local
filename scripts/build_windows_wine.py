@@ -10,7 +10,7 @@ import json
 import os
 import shutil
 import subprocess
-import zipfile
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -65,9 +65,9 @@ def main():
         )
     validation = run(["wine", str(core), "self-test"], capture_output=True, text=True)
     offline = json.loads(validation.stdout)
-    sidecar = ROOT / f"apps/desktop/src-tauri/binaries/lector-core-{TARGET}.exe"
-    sidecar.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(core, sidecar)
+    staging = ROOT / "apps/desktop/src-tauri/runtime-windows"
+    shutil.rmtree(staging, ignore_errors=True)
+    shutil.copytree(core.parent, staging)
     run(
         [
             "npm",
@@ -83,25 +83,19 @@ def main():
             "--ci",
         ]
     )
-    output = ROOT / "artifacts/releases/windows"
+    output = ROOT / "release/desktop/windows"
     output.mkdir(parents=True, exist_ok=True)
+    version = json.loads((ROOT / "package.json").read_text())["version"]
     installers = list(
-        (ROOT / f"apps/desktop/src-tauri/target/{TARGET}/release/bundle/nsis").glob("*-setup.exe")
+        (ROOT / f"apps/desktop/src-tauri/target/{TARGET}/release/bundle/nsis").glob(
+            f"*{version}*-setup.exe"
+        )
     )
     if len(installers) != 1:
         raise RuntimeError("Se esperaba exactamente un instalador NSIS de Windows")
-    version = json.loads((ROOT / "apps/desktop/src-tauri/tauri.conf.json").read_text())["version"]
     destination = output / f"lector-local-{version}-windows-x64-setup.exe"
     shutil.copy2(installers[0], destination)
     deliveries = [destination]
-    for browser in ["chromium", "firefox"]:
-        base = ROOT / f"apps/browser-extension/dist/{browser}"
-        archive_path = output / f"lector-extension-{browser}-unsigned.zip"
-        with zipfile.ZipFile(archive_path, "w", zipfile.ZIP_DEFLATED) as archive:
-            for item in sorted(base.rglob("*")):
-                if item.is_file():
-                    archive.write(item, item.relative_to(base))
-        deliveries.append(archive_path)
     readme = output / "LEEME-Windows.txt"
     shutil.copy2(ROOT / "installers/windows/LEEME.txt", readme)
     deliveries.append(readme)
@@ -122,8 +116,8 @@ def main():
                 "native_windows_validation": "pending tester validation",
                 "included": [
                     "Python",
-                    "Kokoro + voices",
-                    "Piper + Spanish voice",
+                    "Kokoro engine (model download on first use)",
+                    "Piper engine (model download on first use)",
                     "OCR languages",
                     "Visual C++ runtime",
                     "WebView2 offline installer",
@@ -135,6 +129,10 @@ def main():
         + "\n",
         encoding="utf-8",
     )
+    (output / "SIGNING_REQUIRED.txt").write_text(
+        "Unsigned. Windows native UI, WebView2 installation and uninstall need tester validation.\n"
+    )
+    subprocess.run([sys.executable, "scripts/release.py", "--checksums-only"], cwd=ROOT, check=True)
     print(destination)
 
 

@@ -11,6 +11,11 @@ os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1"
 
 
 def main():
+    if sys.platform == "win32":
+        import msvcrt
+
+        msvcrt.setmode(sys.stdin.fileno(), os.O_BINARY)
+        msvcrt.setmode(sys.stdout.fileno(), os.O_BINARY)
     parser = argparse.ArgumentParser(prog="lector-core")
     parser.add_argument(
         "mode",

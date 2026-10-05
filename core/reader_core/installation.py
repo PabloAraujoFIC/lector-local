@@ -11,8 +11,9 @@ import shlex
 import sys
 from pathlib import Path
 
-NAME = "org.lector.local"
-FIREFOX_ID = "lector-local@lector.local"
+from .distribution import FIREFOX_ID, HOST_NAME, chromium_id
+
+NAME = HOST_NAME
 
 
 def browser_paths(home: Path, system: str) -> dict[str, Path]:
@@ -58,14 +59,14 @@ def write_manifest(directory: Path, record: dict, replace: bool = False):
     directory.mkdir(parents=True, exist_ok=True)
     destination = directory / f"{NAME}.json"
     if destination.exists() and not replace:
-        old = json.loads(destination.read_text())
+        old = json.loads(destination.read_text(encoding="utf-8"))
         if old != record:
             raise ValueError(
                 f"Ya existe un registro distinto: {destination}. Usa --replace si deseas sustituirlo."
             )
-    destination.write_text(
-        json.dumps(record, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
-    )
+    temporary = destination.with_suffix(".json.partial")
+    temporary.write_text(json.dumps(record, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    temporary.replace(destination)
     return destination
 
 
@@ -125,6 +126,7 @@ def main():
     )
     parser.add_argument("--host", type=Path, help="Ejecutable lector-core empaquetado")
     parser.add_argument("--chromium-id")
+    parser.add_argument("--channel", choices=["development", "production"], default="production")
     parser.add_argument(
         "--browser",
         choices=["all", "chrome", "chromium", "edge", "brave", "vivaldi", "firefox"],
@@ -136,6 +138,7 @@ def main():
         "--uninstall", action="store_true", help="Retirar solo registros de este host"
     )
     args = parser.parse_args()
+    args.chromium_id = args.chromium_id or chromium_id(args.channel)
     root = Path(__file__).resolve().parents[2]
     if not args.host and getattr(sys, "frozen", False):
         args.host = Path(sys.executable)
@@ -176,7 +179,7 @@ def main():
         return
     # Install only detected browser profiles; --browser explicitly installs even before first run.
     if args.browser == "all" and not args.output and sys.platform != "win32":
-        browsers = [name for name in browsers if paths[name].parent.exists()]
+        browsers = [name for name in browsers if name == "firefox" or paths[name].parent.exists()]
     if not browsers:
         parser.error("No se detectan perfiles. Inicia un navegador o indica --browser.")
     try:
@@ -195,7 +198,7 @@ def main():
                     / "LectorLocal/NativeMessagingHosts"
                     / ("firefox" if name == "firefox" else "chromium")
                 )
-                destination = write_manifest(base, record, args.replace)
+                destination = base / f"{NAME}.json"
                 vendor = {"firefox": "Mozilla", "edge": "Microsoft\\Edge"}.get(
                     name, "Google\\Chrome"
                 )
@@ -209,6 +212,7 @@ def main():
                             )
                 except FileNotFoundError:
                     pass
+                destination = write_manifest(base, record, args.replace)
                 with winreg.CreateKey(winreg.HKEY_CURRENT_USER, keyname) as key:
                     winreg.SetValueEx(key, "", 0, winreg.REG_SZ, str(destination))
             else:

@@ -250,7 +250,7 @@ class Playback:
                     document = self.document
                     index = self.index
                     settings = self.store.settings()
-                    for i in range(index, min(index + settings["prefetch"], len(document.chunks))):
+                    for i in [index]:
                         if i not in pending:
                             pending[i] = self.executor.submit(
                                 self._synthesize, document.chunks[i], settings, cancelled
@@ -272,6 +272,13 @@ class Playback:
                     self.offset_seconds = 0
                     self.status = "paused" if paused.is_set() else "playing"
                     self.event("current_text")
+                    for i in range(
+                        index + 1, min(index + settings["prefetch"], len(document.chunks))
+                    ):
+                        if i not in pending:
+                            pending[i] = self.executor.submit(
+                                self._synthesize, document.chunks[i], settings, cancelled
+                            )
                 self.output.play(audio, rate, cancelled, paused, lambda: self.volume, offset)
                 with self.lock:
                     if cancelled.is_set() or generation != self.generation:
