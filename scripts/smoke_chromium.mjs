@@ -2,7 +2,6 @@ import { chromium } from "playwright";
 import { mkdtemp, mkdir, writeFile, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { spawnSync } from "node:child_process";
 const root = process.cwd();
 const home = await mkdtemp(path.join(tmpdir(), "lector-chromium-"));
 const data = path.join(home, "data");

@@ -24,11 +24,14 @@ def test_does_not_overwrite_unrelated_registration(tmp_path):
 
 
 def test_paths_for_platforms(tmp_path):
-    assert str(register.browser_paths(tmp_path, "linux")["firefox"]).endswith(
-        ".mozilla/native-messaging-hosts"
+    assert (
+        register.browser_paths(tmp_path, "linux")["firefox"]
+        .as_posix()
+        .endswith(".mozilla/native-messaging-hosts")
     )
-    assert "Library/Application Support" in str(
-        register.browser_paths(tmp_path, "darwin")["chrome"]
+    assert (
+        "Library/Application Support"
+        in register.browser_paths(tmp_path, "darwin")["chrome"].as_posix()
     )
 
 

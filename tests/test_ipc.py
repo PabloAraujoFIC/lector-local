@@ -1,3 +1,6 @@
+import json
+import os
+import signal
 import socket
 import subprocess
 import sys
@@ -23,13 +26,19 @@ def daemon(tmp_path, monkeypatch):
             process.terminate()
             pytest.fail("Core did not start")
         time.sleep(0.03)
-    yield tmp_path, process
+    owner_pid = json.loads((tmp_path / "endpoint.json").read_text())["pid"]
+    yield tmp_path, process, owner_pid
+    if owner_pid != process.pid:
+        try:
+            os.kill(owner_pid, signal.SIGTERM)
+        except ProcessLookupError:
+            pass
     process.terminate()
     process.wait(timeout=5)
 
 
 def test_clients_share_single_core_and_reject_browser_files(daemon):
-    directory, process = daemon
+    directory, process, owner_pid = daemon
     first = request(command("settings", values={"speed": 1.25}), "desktop")
     second = request(command("state"), "browser")
     assert first["payload"]["settings"] == second["payload"]["settings"]
@@ -37,7 +46,7 @@ def test_clients_share_single_core_and_reject_browser_files(daemon):
     assert result["error"]["code"] == "permission_denied"
     import json
 
-    assert json.loads((directory / "endpoint.json").read_text())["pid"] == process.pid
+    assert json.loads((directory / "endpoint.json").read_text())["pid"] == owner_pid
 
 
 def test_unauthenticated_clients_are_rejected(daemon):
@@ -58,7 +67,7 @@ def test_unauthenticated_clients_are_rejected(daemon):
 def test_second_daemon_keeps_original_service(daemon):
     import json
 
-    directory, original = daemon
+    directory, original, owner_pid = daemon
     second = subprocess.run(
         [sys.executable, "-m", "reader_core", "daemon"],
         capture_output=True,
@@ -66,7 +75,7 @@ def test_second_daemon_keeps_original_service(daemon):
     )
     assert second.returncode == 0, second.stderr
     assert not second.stderr
-    assert json.loads((directory / "endpoint.json").read_text())["pid"] == original.pid
+    assert json.loads((directory / "endpoint.json").read_text())["pid"] == owner_pid
     assert request(command("state"))["success"]
 
 
