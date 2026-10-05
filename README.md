@@ -16,17 +16,17 @@ No se publican tiendas ni se firman entregas sin credenciales. Los paquetes unsi
 
 ## Descargar para pruebas
 
-Abrir la [Release 0.2.0](https://github.com/PabloAraujoFIC/lector-local/releases/tag/v0.2.0) y escoger el archivo de su sistema. No descargar «Source code» si sólo se quiere instalar.
+Abrir la [Release 0.2.1](https://github.com/PabloAraujoFIC/lector-local/releases/tag/v0.2.1) y escoger el archivo de su sistema. No descargar «Source code» si sólo se quiere instalar.
 
 | Sistema o navegador | Descargar |
 |---|---|
-| Windows 10/11 · x64 | [Instalador .exe](https://github.com/PabloAraujoFIC/lector-local/releases/download/v0.2.0/lector-local-0.2.0-windows-x64-setup.exe) |
-| Ubuntu 22.04+ / Debian 12+ · x64 | [Paquete .deb](https://github.com/PabloAraujoFIC/lector-local/releases/download/v0.2.0/lector-local-0.2.0-linux-x64.deb) |
-| Arch / otras distribuciones · x64 | [Paquete .tar.gz](https://github.com/PabloAraujoFIC/lector-local/releases/download/v0.2.0/lector-local-0.2.0-linux-x64.tar.gz) |
-| macOS 14+ · Apple Silicon | [Instalador .dmg](https://github.com/PabloAraujoFIC/lector-local/releases/download/v0.2.0/lector-local-0.2.0-macos-arm64.dmg) |
-| macOS 14+ · Intel | [Instalador .dmg](https://github.com/PabloAraujoFIC/lector-local/releases/download/v0.2.0/lector-local-0.2.0-macos-x64.dmg) |
-| Chrome / Chromium / Edge / Brave | [Extensión .zip](https://github.com/PabloAraujoFIC/lector-local/releases/download/v0.2.0/lector-local-0.2.0-chrome.zip) |
-| Firefox / Zen · Gecko 140+ | [Extensión .zip (temporal)](https://github.com/PabloAraujoFIC/lector-local/releases/download/v0.2.0/lector-local-0.2.0-firefox.zip) |
+| Windows 10/11 · x64 | [Instalador .exe](https://github.com/PabloAraujoFIC/lector-local/releases/download/v0.2.1/lector-local-0.2.1-windows-x64-setup.exe) |
+| Ubuntu 22.04+ / Debian 12+ · x64 | [Paquete .deb](https://github.com/PabloAraujoFIC/lector-local/releases/download/v0.2.1/lector-local-0.2.1-linux-x64.deb) |
+| Arch / otras distribuciones · x64 | [Paquete .tar.gz](https://github.com/PabloAraujoFIC/lector-local/releases/download/v0.2.1/lector-local-0.2.1-linux-x64.tar.gz) |
+| macOS 14+ · Apple Silicon | [Instalador .dmg](https://github.com/PabloAraujoFIC/lector-local/releases/download/v0.2.1/lector-local-0.2.1-macos-arm64.dmg) |
+| macOS 14+ · Intel | [Instalador .dmg](https://github.com/PabloAraujoFIC/lector-local/releases/download/v0.2.1/lector-local-0.2.1-macos-x64.dmg) |
+| Chrome / Chromium / Edge / Brave | [Extensión .zip](https://github.com/PabloAraujoFIC/lector-local/releases/download/v0.2.1/lector-local-0.2.1-chrome.zip) |
+| Firefox / Zen · Gecko 140+ | [Extensión .zip (temporal)](https://github.com/PabloAraujoFIC/lector-local/releases/download/v0.2.1/lector-local-0.2.1-firefox.zip) |
 
-Primero instalar el escritorio y descargar una voz desde Ajustes. Después añadir la extensión siguiendo [la guía paso a paso](docs/TESTERS.md). Comprobar [SHA256SUMS-downloads.txt](https://github.com/PabloAraujoFIC/lector-local/releases/download/v0.2.0/SHA256SUMS-downloads.txt) incluido en la Release. Es una entrega de pruebas sin certificados de producción: **SIGNING_REQUIRED**. Los instaladores se han construido en runners nativos de GitHub Actions. La validación manual de instalación, interfaz y audio en Windows/macOS queda a cargo de los testers. Si el repositorio es privado, las descargas requieren acceso concedido por el propietario.
+Primero instalar el escritorio y descargar una voz desde Ajustes. Después añadir la extensión siguiendo [la guía paso a paso](docs/TESTERS.md). Comprobar [SHA256SUMS-downloads.txt](https://github.com/PabloAraujoFIC/lector-local/releases/download/v0.2.1/SHA256SUMS-downloads.txt) incluido en la Release. Es una entrega de pruebas sin certificados de producción: **SIGNING_REQUIRED**. Los instaladores se han construido en runners nativos de GitHub Actions. La validación manual de instalación, interfaz y audio en Windows/macOS queda a cargo de los testers. Si el repositorio es privado, las descargas requieren acceso concedido por el propietario.
 

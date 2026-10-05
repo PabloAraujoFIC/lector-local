@@ -1,4 +1,4 @@
-# Release 0.2.0
+# Release 0.2.1
 
 Requisitos de construcción: Node.js 22, Python 3.12, uv y Rust estable. `uv sync --extra dev --frozen --python 3.12`, `npm ci`; en Linux instalar bibliotecas de desarrollo GTK/WebKit/PortAudio indicadas en CI.
 
