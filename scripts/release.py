@@ -104,9 +104,9 @@ def main():
         if sys.platform == "linux":
             command += ["--bundles", "deb"]
         elif sys.platform == "darwin":
-            command += ["--config", "apps/desktop/src-tauri/tauri.macos.conf.json"]
+            command += ["--config", str(ROOT / "apps/desktop/src-tauri/tauri.macos.conf.json")]
         else:
-            command += ["--config", "apps/desktop/src-tauri/tauri.windows.conf.json"]
+            command += ["--config", str(ROOT / "apps/desktop/src-tauri/tauri.windows.conf.json")]
         with tempfile.TemporaryDirectory(prefix="lector-signing-") as temporary:
             if args.signed and sys.platform == "win32":
                 signing = Path(temporary) / "signing.json"
