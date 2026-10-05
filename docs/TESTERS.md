@@ -13,7 +13,7 @@ Enviar el instalador de su sistema y el ZIP de su navegador desde release/. Envi
 
 1. En Ubuntu 22.04 o posterior, Debian 12 o posterior y sistemas compatibles con glibc ≥ 2.35 y WebKitGTK 4.1, instalar el `.deb`: `sudo apt install ./lector-local-0.2.0-linux-x64.deb`. apt resuelve bibliotecas del sistema como WebKitGTK; Python y motores vienen incluidos.
 2. Abrir Lector Local desde el menú. Descargar una voz en Ajustes.
-3. Para Arch u otras distribuciones, usar el tar portátil si se incluye en la entrega; descomprimir y ejecutar lector-local-desktop dentro de la carpeta, conservando core/ a su lado. El tar publicado de CI requiere glibc 2.35 o posterior y WebKitGTK 4.1/GTK3 del sistema. El build local de Arch requería glibc 2.44 y ha sido sustituido por el build Ubuntu para distribución. Las dependencias exactas se indican en el reporte de build. No existe AppImage validada en esta entrega.
+3. Para Arch u otras distribuciones, usar el tar portátil si se incluye en la entrega; descomprimir y ejecutar lector-local-desktop dentro de la carpeta, conservando core/ a su lado. El tar publicado de CI requiere glibc 2.35 o posterior y WebKitGTK 4.1/GTK3, ALSA y PortAudio del sistema (en Arch: webkit2gtk-4.1, gtk3, alsa-lib, portaudio y pipewire-alsa). El build local de Arch requería glibc 2.44 y ha sido sustituido por el build Ubuntu para distribución. Las dependencias exactas se indican en el reporte de build. No existe AppImage validada en esta entrega.
 4. Abrir el navegador al menos una vez y volver a abrir Lector Local para registrar el host. Añadir la extensión.
 
 ## macOS 14 o posterior · Intel / Apple Silicon

@@ -149,6 +149,13 @@ def main():
     )
     import shutil
 
+    if sys.platform == "linux":
+        # ALSA loads distro-specific plugins outside the bundle. Shipping the
+        # build host's ALSA/JACK prevents PipeWire discovery on other distros.
+        for pattern in ("libasound.so*", "libjack.so*", "libportaudio.so*"):
+            for library in (output / "core/lector-core/_internal").glob(pattern):
+                library.unlink()
+
     suffix = ".exe" if sys.platform == "win32" else ""
     executable = output / "core/lector-core" / ("lector-core" + suffix)
     subprocess.run([str(executable), "self-test"], check=True)

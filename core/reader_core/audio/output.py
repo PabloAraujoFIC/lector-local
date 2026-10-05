@@ -1,6 +1,23 @@
+import sys
 import threading
 
 from ..errors import ReaderError
+
+
+def system_output_device(sd):
+    """Use the session audio server instead of a cached physical ALSA card."""
+    if sys.platform == "linux":
+        devices = sd.query_devices()
+        apis = sd.query_hostapis()
+        for name in ("pipewire", "pulse"):
+            for index, device in enumerate(devices):
+                if (
+                    device["name"] == name
+                    and device["max_output_channels"] > 0
+                    and apis[device["hostapi"]]["name"] == "ALSA"
+                ):
+                    return index
+    return None
 
 
 class AudioOutput:
@@ -38,6 +55,7 @@ class AudioOutput:
 
         try:
             with sd.OutputStream(
+                device=system_output_device(sd),
                 samplerate=rate,
                 channels=1,
                 dtype="float32",
