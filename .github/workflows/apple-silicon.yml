@@ -1,0 +1,46 @@
+name: Apple Silicon installer fallback
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Existing test release tag
+        required: true
+        default: v0.2.0
+      runner:
+        description: ARM runner pool
+        type: choice
+        options: [macos-26, macos-14, macos-15]
+        default: macos-26
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ${{ inputs.runner }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.12.23'
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: apps/desktop/src-tauri
+      - run: uv sync --extra dev --python 3.12 --frozen
+      - run: npm ci
+      - run: uv run --extra dev python scripts/release.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lector-local-macos-arm64-SIGNING_REQUIRED
+          path: release/
+          if-no-files-found: error
+      - name: Add verified DMG and checksums to test release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
+        run: |
+          gh release upload "$RELEASE_TAG" release/desktop/macos/*.dmg --clobber
+          uv run --extra dev python scripts/refresh_release_checksums.py "$RELEASE_TAG"
