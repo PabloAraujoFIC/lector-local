@@ -12,6 +12,7 @@ def archive(path: Path, files: list[tuple[Path, str]]):
     with zipfile.ZipFile(path, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as output:
         for source, name in sorted(files, key=lambda pair: pair[1]):
             info = zipfile.ZipInfo(name, (2020, 1, 1, 0, 0, 0))
+            info.create_system = 3
             info.compress_type = zipfile.ZIP_DEFLATED
             info.external_attr = 0o100644 << 16
             output.writestr(info, source.read_bytes(), compresslevel=9)

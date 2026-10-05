@@ -40,7 +40,8 @@ def collect_desktop(signed: bool = False):
     if not generated:
         raise RuntimeError("The requested native installer was not generated")
     for path in generated:
-        target = output / f"lector-local-{version}-{folder}-{architecture}{suffix}"
+        installer = "-setup" if sys.platform == "win32" else ""
+        target = output / f"lector-local-{version}-{folder}-{architecture}{installer}{suffix}"
         shutil.copy2(path, target)
     if sys.platform == "linux":
         with tarfile.open(

@@ -5,6 +5,7 @@ import json
 import shutil
 import subprocess
 import sys
+import zipfile
 from pathlib import Path
 
 
@@ -16,18 +17,31 @@ def main():
     assets = Path("artifacts/github-release")
     assets.mkdir(parents=True, exist_ok=True)
     selected = {}
-    for path in directory.rglob("*"):
+    for path in sorted(directory.rglob("*")):
         if (
             path.is_file()
             and path.suffix in {".exe", ".deb", ".dmg", ".zip"}
             or (path.is_file() and path.name.endswith(".tar.gz"))
         ):
             if "lector-local" in path.name:
-                target = assets / path.name
+                name = path.name
+                if name.endswith("-windows-x64.exe"):
+                    name = name.removesuffix(".exe") + "-setup.exe"
+                target = assets / name
                 if target.exists() and target.read_bytes() != path.read_bytes():
-                    raise ValueError(f"Conflicting artifacts: {path.name}")
+                    # Older Windows ZIPs differ only in the creator OS header.
+                    # Reject actual source/bundle differences across platforms.
+                    if path.suffix == ".zip":
+                        with zipfile.ZipFile(target) as a, zipfile.ZipFile(path) as b:
+                            same = sorted(a.namelist()) == sorted(b.namelist()) and all(
+                                a.read(member) == b.read(member) for member in a.namelist()
+                            )
+                        if same:
+                            selected[name] = target
+                            continue
+                    raise ValueError(f"Conflicting artifacts: {name}")
                 shutil.copy2(path, target)
-                selected[path.name] = target
+                selected[name] = target
     shutil.copy2("docs/TESTERS.md", assets / "GUIA-TESTERS.md")
     selected["GUIA-TESTERS.md"] = assets / "GUIA-TESTERS.md"
     records = []
