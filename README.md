@@ -18,15 +18,15 @@ No se publican tiendas ni se firman entregas sin credenciales. Los paquetes unsi
 
 Abrir la [Release 0.2.0](https://github.com/PabloAraujoFIC/lector-local/releases/tag/v0.2.0) y escoger el archivo de su sistema. No descargar «Source code» si sólo se quiere instalar.
 
-| Sistema o navegador | Archivo |
+| Sistema o navegador | Descargar |
 |---|---|
-| Windows 10/11 · x64 | `lector-local-0.2.0-windows-x64-setup.exe` |
-| Linux Debian/Ubuntu · x64 | `lector-local-0.2.0-linux-x64.deb` |
-| Linux Arch/otras · x64 | `lector-local-0.2.0-linux-x64.tar.gz` (si figura en la Release) |
-| macOS · Apple Silicon | `lector-local-0.2.0-macos-arm64.dmg` (sólo si la build nativa termina correctamente) |
-| macOS · Intel | `lector-local-0.2.0-macos-x64.dmg` (sólo si la build nativa termina correctamente) |
-| Chrome / Chromium / Edge / Brave | `lector-local-0.2.0-chrome.zip` |
-| Firefox / Zen · Gecko 140+ | `lector-local-0.2.0-firefox.zip` (instalación temporal; firma AMO pendiente) |
+| Windows 10/11 · x64 | [Instalador .exe](https://github.com/PabloAraujoFIC/lector-local/releases/download/v0.2.0/lector-local-0.2.0-windows-x64-setup.exe) |
+| Ubuntu 22.04+ / Debian 12+ · x64 | [Paquete .deb](https://github.com/PabloAraujoFIC/lector-local/releases/download/v0.2.0/lector-local-0.2.0-linux-x64.deb) |
+| Arch / otras distribuciones · x64 | [Paquete .tar.gz](https://github.com/PabloAraujoFIC/lector-local/releases/download/v0.2.0/lector-local-0.2.0-linux-x64.tar.gz) |
+| macOS 14+ · Apple Silicon | [Instalador .dmg](https://github.com/PabloAraujoFIC/lector-local/releases/download/v0.2.0/lector-local-0.2.0-macos-arm64.dmg) |
+| macOS 14+ · Intel | [Instalador .dmg](https://github.com/PabloAraujoFIC/lector-local/releases/download/v0.2.0/lector-local-0.2.0-macos-x64.dmg) |
+| Chrome / Chromium / Edge / Brave | [Extensión .zip](https://github.com/PabloAraujoFIC/lector-local/releases/download/v0.2.0/lector-local-0.2.0-chrome.zip) |
+| Firefox / Zen · Gecko 140+ | [Extensión .zip (temporal)](https://github.com/PabloAraujoFIC/lector-local/releases/download/v0.2.0/lector-local-0.2.0-firefox.zip) |
 
-Primero instalar el escritorio y descargar una voz desde Ajustes. Después añadir la extensión siguiendo [la guía paso a paso](docs/TESTERS.md). Comprobar SHA256SUMS.txt incluido en la Release. Es una entrega de pruebas sin certificados de producción: **SIGNING_REQUIRED**. La Release sólo ofrece archivos que se han generado realmente; las plataformas pendientes se indican en sus notas.
+Primero instalar el escritorio y descargar una voz desde Ajustes. Después añadir la extensión siguiendo [la guía paso a paso](docs/TESTERS.md). Comprobar [SHA256SUMS-downloads.txt](https://github.com/PabloAraujoFIC/lector-local/releases/download/v0.2.0/SHA256SUMS-downloads.txt) incluido en la Release. Es una entrega de pruebas sin certificados de producción: **SIGNING_REQUIRED**. Los instaladores se han construido en runners nativos de GitHub Actions. La validación manual de instalación, interfaz y audio en Windows/macOS queda a cargo de los testers. Si el repositorio es privado, las descargas requieren acceso concedido por el propietario.
 
