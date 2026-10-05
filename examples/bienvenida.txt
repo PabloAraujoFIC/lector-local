@@ -1,0 +1,17 @@
+Bienvenido a Lector Local
+
+Hay una forma distinta de acercarse a un texto: cerrar los ojos, encontrar un ritmo y dejar que las palabras te acompañen. Este lector convierte tus documentos en voz sin enviarlos a ningún servidor.
+
+Todo sucede aquí, en tu dispositivo. Puedes escuchar un libro durante un paseo, seguir un artículo mientras descansas o volver a un párrafo que merece una segunda lectura.
+
+Hazlo a tu ritmo
+
+Pulsa Play para comenzar. Cambia la velocidad y elige la voz que te resulte más cómoda. Si necesitas un descanso, pausa la lectura; el punto en el que te quedas se guarda localmente.
+
+Puedes pulsar cualquier párrafo para empezar desde ahí. Los controles anterior y siguiente te permiten avanzar por el documento sin perder el hilo.
+
+También en tu navegador
+
+Desde Ajustes puedes registrar el host local. Después, selecciona texto en una página y elige «Leer selección» en el menú del navegador. El escritorio y la extensión utilizan el mismo motor y el mismo reproductor.
+
+Una vez instalado el modelo, no necesitas conexión a Internet para leer. Tu próxima lectura te espera.

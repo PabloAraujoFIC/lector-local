@@ -1,0 +1,167 @@
+:root {
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  color: #e5e8df;
+  background: #111510;
+  font-synthesis: none;
+  color-scheme: dark;
+  --muted: #90978a;
+  --line: #2c3228;
+  --accent: #c0db96;
+  --panel: #191e16;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+button,
+input,
+select {
+  font: inherit;
+}
+button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  border-radius: 8px;
+  padding: 9px;
+}
+button:hover {
+  background: #ffffff0b;
+}
+button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+button:focus-visible,
+select:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+input,
+select {
+  color: inherit;
+  accent-color: var(--accent);
+}
+select {
+  background: #20261c;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 9px 30px 9px 12px;
+  appearance: none;
+}
+select option {
+  background: #20261c;
+}
+.select-wrap {
+  position: relative;
+}
+.select-wrap svg {
+  position: absolute;
+  right: 10px;
+  top: 14px;
+  pointer-events: none;
+}
+.transport {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+}
+.play-button {
+  border-radius: 50%;
+  background: var(--accent);
+  color: #243319;
+  width: 54px;
+  height: 54px;
+}
+.play-button:hover {
+  background: #d1e8b0;
+}
+.seconds {
+  font-size: 14px;
+}
+.seconds span {
+  font-size: 10px;
+  color: var(--muted);
+  align-self: flex-end;
+}
+.voice-settings {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  justify-content: center;
+}
+.voice-settings label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.voice-settings select {
+  font-size: 12px;
+  color: #e5e8df;
+}
+.player-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.volume-label input {
+  width: 78px;
+  height: 3px;
+}
+.privacy {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+.compact {
+  gap: 12px;
+}
+.compact .transport {
+  gap: 6px;
+}
+.compact .voice-settings {
+  gap: 10px;
+}
+.compact .voice-settings label {
+  display: block;
+}
+.compact select {
+  margin-top: 5px;
+  max-width: 160px;
+}
+.error-banner {
+  background: #392922;
+  border: 1px solid #694537;
+  color: #f2cbb5;
+  padding: 12px 16px;
+  border-radius: 9px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.primary {
+  background: var(--accent);
+  color: #243319;
+  padding: 10px 15px;
+  font-weight: 600;
+}
+.primary:hover {
+  background: #d1e8b0;
+}

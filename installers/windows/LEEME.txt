@@ -1,0 +1,31 @@
+Lector Local 0.1.0 — prueba para Windows 10/11 de 64 bits
+
+1. Ejecuta lector-local-0.1.0-windows-x64-setup.exe y sigue el asistente.
+   Instala para tu usuario. Incluye Python, Kokoro, Piper con voz española,
+   OCR, las bibliotecas Visual C++ y el instalador offline de WebView2.
+   No necesitas instalar herramientas de desarrollo ni descargar modelos.
+2. Abre Lector Local desde el menú Inicio y prueba un texto con ambos motores.
+
+Extensión opcional para leer páginas:
+
+Firefox / Zen:
+- Descomprime lector-extension-firefox-unsigned.zip en una carpeta permanente.
+- Abre about:debugging#/runtime/this-firefox, pulsa «Cargar complemento temporal»
+  y selecciona manifest.json de esa carpeta.
+- El instalador registra automáticamente el host de Firefox/Zen. Si no conecta,
+  abre Ajustes > Navegadores en Lector Local y registra Firefox.
+- La extensión temporal se debe cargar otra vez al reiniciar el navegador.
+
+Chrome / Chromium / Edge / Brave / Vivaldi:
+- Descomprime lector-extension-chromium-unsigned.zip.
+- En la página de extensiones del navegador, activa el modo de desarrollador
+  y usa «Cargar descomprimida» con la carpeta que contiene manifest.json.
+- Copia el ID de la extensión y regístralo en Ajustes > Navegadores de Lector Local.
+
+Esta entrega no tiene firma de editor; Windows puede mostrar una advertencia
+de aplicación desconocida. La compilación y las pruebas de voz/OCR se han
+realizado en Linux con Wine; falta la validación del instalador y la interfaz
+en Windows real. Informa de versión de Windows/navegador, pasos para reproducir
+y mensaje exacto si encuentras un problema.
+
+Desinstalación: Configuración de Windows > Aplicaciones > Lector Local.

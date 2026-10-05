@@ -1,0 +1,1 @@
+{"identifier":"default","description":"Abrir documentos y recibir archivos arrastrados","windows":["main"],"permissions":["core:default","dialog:allow-open"]}

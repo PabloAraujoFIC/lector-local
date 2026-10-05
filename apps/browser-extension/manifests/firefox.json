@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "Lector Local",
+  "version": "0.1.0",
+  "description": "Escucha selecciones y artículos con el motor TTS de tu dispositivo.",
+  "permissions": [
+    "contextMenus",
+    "activeTab",
+    "scripting",
+    "nativeMessaging",
+    "storage"
+  ],
+  "background": { "scripts": ["background.js"] },
+  "action": { "default_popup": "popup.html", "default_title": "Lector Local" },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "lector-local@lector.local",
+      "strict_min_version": "140.0",
+      "data_collection_permissions": { "required": ["none"] }
+    }
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none'"
+  }
+}

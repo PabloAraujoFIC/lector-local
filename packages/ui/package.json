@@ -1,0 +1,1 @@
+{"name":"@lector/ui","version":"0.1.0","private":true,"type":"module","exports":{".":"./src/index.tsx","./style.css":"./src/style.css"},"dependencies":{"@lector/types":"0.1.0","react":"^19.2.0","lucide-react":"^0.468.0"}}
