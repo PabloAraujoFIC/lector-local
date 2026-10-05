@@ -85,7 +85,7 @@ def main():
     )
     output = ROOT / "release/desktop/windows"
     output.mkdir(parents=True, exist_ok=True)
-    version = json.loads((ROOT / "package.json").read_text())["version"]
+    version = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))["version"]
     installers = list(
         (ROOT / f"apps/desktop/src-tauri/target/{TARGET}/release/bundle/nsis").glob(
             f"*{version}*-setup.exe"

@@ -6,10 +6,17 @@ from reader_core import model_manager
 
 
 def catalog(monkeypatch, expected: bytes, actual: bytes):
-    monkeypatch.setattr(
-        model_manager,
-        "FILES",
-        {"model.onnx": (len(expected), hashlib.sha256(expected).hexdigest())},
+    monkeypatch.setitem(
+        model_manager.CATALOG,
+        "kokoro",
+        [
+            {
+                "path": "model.onnx",
+                "bytes": len(expected),
+                "sha256": hashlib.sha256(expected).hexdigest(),
+                "url": "https://example.test/model",
+            }
+        ],
     )
     monkeypatch.setattr(
         model_manager.urllib.request, "urlopen", lambda *args, **kwargs: io.BytesIO(actual)

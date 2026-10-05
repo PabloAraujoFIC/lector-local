@@ -34,7 +34,7 @@ def collect_desktop(signed: bool = False):
     output = ROOT / "release/desktop" / folder
     output.mkdir(parents=True, exist_ok=True)
     bundles = ROOT / "apps/desktop/src-tauri/target/release/bundle"
-    version = json.loads((ROOT / "package.json").read_text())["version"]
+    version = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))["version"]
     architecture = "arm64" if platform.machine().lower() in {"arm64", "aarch64"} else "x64"
     generated = list(bundles.rglob(f"*{version}*{suffix}"))
     if not generated:

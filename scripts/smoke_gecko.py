@@ -233,7 +233,7 @@ def main():
                     indent=2,
                 )
             )
-            print(args.report.read_text())
+            print(args.report.read_text(encoding="utf-8"))
         finally:
             try:
                 driver.delete_session()
@@ -247,10 +247,10 @@ def main():
                 process.wait()
             endpoint = data / "endpoint.json"
             if endpoint.exists():
-                os.kill(json.loads(endpoint.read_text())["pid"], signal.SIGTERM)
+                os.kill(json.loads(endpoint.read_text(encoding="utf-8"))["pid"], signal.SIGTERM)
             log.close()
             if not args.report.exists():
-                print((home / "browser.log").read_text()[-5000:], file=sys.stderr)
+                print((home / "browser.log").read_text(encoding="utf-8")[-5000:], file=sys.stderr)
 
 
 if __name__ == "__main__":

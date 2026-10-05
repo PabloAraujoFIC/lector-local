@@ -32,10 +32,9 @@ def main():
         )
     for path in (ROOT / "apps/browser-extension/src").glob("*"):
         if path.suffix in {".ts", ".tsx"}:
-            assert (
-                "innerHTML" not in path.read_text()
-                and "dangerouslySetInnerHTML" not in path.read_text()
-            )
+            assert "innerHTML" not in path.read_text(
+                encoding="utf-8"
+            ) and "dangerouslySetInnerHTML" not in path.read_text(encoding="utf-8")
     assert len(report["warnings"]) <= 4, report["warnings"]
     print(
         f"AMO: 0 errors; {len(report['warnings'])} documented React/Readability DOM-helper warnings. Report: {destination}"

@@ -11,11 +11,11 @@ SECRET = re.compile(
 
 
 def main():
-    version = json.loads((ROOT / "package.json").read_text())["version"]
-    config = json.loads((ROOT / "core/reader_core/distribution.json").read_text())
+    version = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))["version"]
+    config = json.loads((ROOT / "core/reader_core/distribution.json").read_text(encoding="utf-8"))
     for browser in ["chromium", "firefox"]:
         directory = ROOT / "apps/browser-extension/dist" / browser
-        manifest = json.loads((directory / "manifest.json").read_text())
+        manifest = json.loads((directory / "manifest.json").read_text(encoding="utf-8"))
         assert manifest["manifest_version"] == 3 and manifest["version"] == version
         assert set(manifest["permissions"]) == {
             "contextMenus",
@@ -35,7 +35,7 @@ def main():
         for path in files:
             assert path.suffix in {".js", ".css", ".html", ".json", ".png"}, path
             if path.suffix != ".png":
-                text = path.read_text()
+                text = path.read_text(encoding="utf-8")
                 assert not SECRET.search(text), f"Secret pattern in {path}"
                 assert "sourceMappingURL=" not in text
                 assert not re.search(r"\beval\s*\(|\bnew Function\s*\(", text), path
@@ -50,7 +50,9 @@ def main():
                 "__pycache__",
             }.intersection(path.parts):
                 if path.suffix in {".py", ".ts", ".tsx", ".rs", ".md", ".json", ".mjs", ".yml"}:
-                    assert not SECRET.search(path.read_text()), f"Secret pattern in {path}"
+                    assert not SECRET.search(path.read_text(encoding="utf-8")), (
+                        f"Secret pattern in {path}"
+                    )
     print(
         "Store checks passed: manifests, sizes, assets, no maps, no secrets, no dynamic evaluation"
     )

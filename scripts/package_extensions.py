@@ -18,7 +18,7 @@ def archive(path: Path, files: list[tuple[Path, str]]):
 
 
 def main():
-    version = json.loads((ROOT / "package.json").read_text())["version"]
+    version = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))["version"]
     output = ROOT / "release/extensions"
     output.mkdir(parents=True, exist_ok=True)
     for path in output.glob("lector-*.zip"):

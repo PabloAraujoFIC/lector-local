@@ -17,7 +17,7 @@ def verified(path, record):
 
 def prepare(root: Path):
     destination = root / "artifacts/bundled-assets"
-    records = json.loads((root / "models/bundled-assets.json").read_text())
+    records = json.loads((root / "models/bundled-assets.json").read_text(encoding="utf-8"))
     shutil.rmtree(destination / "models", ignore_errors=True)
     for record in records:
         target = destination / record["path"]

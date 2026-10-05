@@ -149,11 +149,11 @@ def main():
                 host.wait(timeout=5)
             endpoint = directory / "endpoint.json"
             if endpoint.exists():
-                os.kill(json.loads(endpoint.read_text())["pid"], signal.SIGTERM)
+                os.kill(json.loads(endpoint.read_text(encoding="utf-8"))["pid"], signal.SIGTERM)
                 time.sleep(0.2)
             log = directory / "core.log"
             if log.exists() and log.stat().st_size:
-                print(log.read_text(), file=sys.stderr)
+                print(log.read_text(encoding="utf-8"), file=sys.stderr)
 
 
 if __name__ == "__main__":

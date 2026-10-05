@@ -12,7 +12,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--set")
     args = parser.parse_args()
-    authority = json.loads((ROOT / "package.json").read_text())
+    authority = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
     version = args.set or authority["version"]
     if not re.fullmatch(r"\d+\.\d+\.\d+", version):
         parser.error("Se requiere una versión major.minor.patch")
@@ -23,14 +23,14 @@ def main():
         ROOT / "apps/desktop/src-tauri/tauri.conf.json",
     ]
     for path in json_paths:
-        data = json.loads(path.read_text())
+        data = json.loads(path.read_text(encoding="utf-8"))
         if args.set:
             data["version"] = version
             path.write_text(json.dumps(data, indent=2) + "\n")
         elif data["version"] != version:
             raise ValueError(f"Versión incoherente: {path}")
     for path in [ROOT / "pyproject.toml", ROOT / "apps/desktop/src-tauri/Cargo.toml"]:
-        text = path.read_text()
+        text = path.read_text(encoding="utf-8")
         if args.set:
             path.write_text(
                 re.sub(r'^version = "[^"]+"', f'version = "{version}"', text, count=1, flags=re.M)

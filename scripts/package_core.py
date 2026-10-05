@@ -51,6 +51,21 @@ def main():
         )
     if args.target and args.target != native_target:
         parser.error("PyInstaller requiere construir el core en el SO y arquitectura de destino")
+    if sys.platform == "win32" and not args.windows_runtime:
+        import shutil
+
+        redistributable = output / "microsoft-runtime"
+        redistributable.mkdir(parents=True, exist_ok=True)
+        system = Path(os.environ["SystemRoot"]) / "System32"
+        for name in ["msvcp140.dll", "msvcp140_1.dll", "vcruntime140.dll", "vcruntime140_1.dll"]:
+            source = system / name
+            if not source.is_file():
+                source = Path(sys.base_prefix) / name
+            if not source.is_file():
+                parser.error(f"Build host missing Microsoft runtime: {name}; use --windows-runtime")
+            shutil.copy2(source, redistributable / name)
+        shutil.copy2(root / "installers/windows/Microsoft-Visual-C++-License.rtf", redistributable)
+        args.windows_runtime = redistributable
     runtime_args = []
     if args.windows_runtime:
         if sys.platform != "win32":
@@ -92,7 +107,9 @@ def main():
             str(root / "core"),
             "--collect-all",
             "kokoro_onnx",
-            "--collect-all",
+            "--collect-data",
+            "piper",
+            "--collect-binaries",
             "piper",
             "--recursive-copy-metadata",
             "piper-tts",

@@ -16,7 +16,7 @@ Enviar el instalador de su sistema y el ZIP de su navegador desde release/. Envi
 3. Para Arch u otras distribuciones, usar el tar portátil si se incluye en la entrega; descomprimir y ejecutar lector-local-desktop dentro de la carpeta, conservando core/ a su lado. El tar publicado de CI requiere glibc 2.35 o posterior y WebKitGTK 4.1/GTK3 del sistema. El build local de Arch requería glibc 2.44 y ha sido sustituido por el build Ubuntu para distribución. Las dependencias exactas se indican en el reporte de build. No existe AppImage validada en esta entrega.
 4. Abrir el navegador al menos una vez y volver a abrir Lector Local para registrar el host. Añadir la extensión.
 
-## macOS Intel / Apple Silicon
+## macOS 14 o posterior · Intel / Apple Silicon
 
 1. Usar sólo el DMG correspondiente a su arquitectura, descargado del artefacto CI si se ha generado.
 2. Abrir DMG y arrastrar Lector Local a Aplicaciones; iniciar desde allí.

@@ -38,7 +38,9 @@ def test_piper_download_rollback_is_directory_atomic(tmp_path, monkeypatch):
         model_manager.install(directory, "piper")
     assert (directory / "voice.onnx").read_bytes() == b"old"
     assert not (directory / "voice.json").exists()
-    assert sorted(p.name for p in tmp_path.iterdir()) == ["piper"]
+    assert sorted(p.name for p in tmp_path.iterdir() if not p.name.endswith(".download.lock")) == [
+        "piper"
+    ]
 
 
 def test_model_fingerprint_changes_with_content_without_path_dependence(tmp_path):

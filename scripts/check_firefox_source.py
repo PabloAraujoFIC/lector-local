@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def main():
-    version = json.loads((ROOT / "package.json").read_text())["version"]
+    version = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))["version"]
     with tempfile.TemporaryDirectory(prefix="lector-amo-source-") as directory:
         work = Path(directory)
         with zipfile.ZipFile(

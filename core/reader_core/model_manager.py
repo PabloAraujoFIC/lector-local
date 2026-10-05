@@ -8,11 +8,10 @@ import tempfile
 import urllib.request
 from pathlib import Path
 
+from .ipc import instance_lock
 from .paths import data_dir
 
 CATALOG = json.loads(Path(__file__).with_name("model_catalog.json").read_text(encoding="utf-8"))
-BASE = "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/"
-FILES = {r["path"]: (r["bytes"], r["sha256"]) for r in CATALOG["kokoro"]}
 
 
 def verified(path: Path, record: dict) -> bool:
@@ -24,55 +23,52 @@ def verified(path: Path, record: dict) -> bool:
 
 def install(directory: Path, engine: str = "kokoro"):
     records = CATALOG[engine]
-    # Keep the small injectable catalog used by offline download tests.
-    if engine == "kokoro":
-        records = [
-            dict(path=name, bytes=size, sha256=digest, url=BASE + name)
-            for name, (size, digest) in FILES.items()
-        ]
     if all(verified(directory / r["path"], r) for r in records):
         return
     directory.parent.mkdir(parents=True, exist_ok=True)
-    lock = directory.parent / (directory.name + ".download-lock")
+    lock = directory.parent / (directory.name + ".download.lock")
     try:
-        lock.mkdir()
-    except FileExistsError as exc:
+        with instance_lock(lock):
+            with tempfile.TemporaryDirectory(
+                prefix=directory.name + "-", dir=directory.parent
+            ) as work:
+                stage = Path(work) / "model"
+                stage.mkdir()
+                for record in records:
+                    if not record["url"].startswith("https://"):
+                        raise ValueError("La descarga requiere HTTPS.")
+                    target = stage / record["path"]
+                    if verified(directory / record["path"], record):
+                        shutil.copy2(directory / record["path"], target)
+                        continue
+                    with urllib.request.urlopen(record["url"], timeout=120) as response:
+                        if hasattr(response, "geturl") and not response.geturl().startswith(
+                            "https://"
+                        ):
+                            raise ValueError("La redirección requiere HTTPS.")
+                        with target.open("wb") as stream:
+                            downloaded = 0
+                            while block := response.read(1024 * 1024):
+                                downloaded += len(block)
+                                if downloaded > record["bytes"]:
+                                    raise ValueError("El archivo supera el tamaño previsto.")
+                                stream.write(block)
+                    if not verified(target, record):
+                        raise ValueError("El modelo no supera la verificación de integridad.")
+                    print(
+                        json.dumps({"file": record["path"], "bytes": record["bytes"]}), flush=True
+                    )
+                backup = Path(work) / "previous"
+                if directory.exists():
+                    directory.rename(backup)
+                try:
+                    stage.rename(directory)
+                except OSError:
+                    if backup.exists():
+                        backup.rename(directory)
+                    raise
+    except BlockingIOError as exc:
         raise ValueError("Ya hay una descarga de este motor en curso.") from exc
-    try:
-        with tempfile.TemporaryDirectory(prefix=directory.name + "-", dir=directory.parent) as work:
-            stage = Path(work) / "model"
-            stage.mkdir()
-            for record in records:
-                if not record["url"].startswith("https://"):
-                    raise ValueError("La descarga requiere HTTPS.")
-                target = stage / record["path"]
-                if verified(directory / record["path"], record):
-                    shutil.copy2(directory / record["path"], target)
-                    continue
-                with urllib.request.urlopen(record["url"], timeout=120) as response:
-                    if hasattr(response, "geturl") and not response.geturl().startswith("https://"):
-                        raise ValueError("La redirección requiere HTTPS.")
-                    with target.open("wb") as stream:
-                        downloaded = 0
-                        while block := response.read(1024 * 1024):
-                            downloaded += len(block)
-                            if downloaded > record["bytes"]:
-                                raise ValueError("El archivo supera el tamaño previsto.")
-                            stream.write(block)
-                if not verified(target, record):
-                    raise ValueError("El modelo no supera la verificación de integridad.")
-                print(json.dumps({"file": record["path"], "bytes": record["bytes"]}), flush=True)
-            backup = Path(work) / "previous"
-            if directory.exists():
-                directory.rename(backup)
-            try:
-                stage.rename(directory)
-            except OSError:
-                if backup.exists():
-                    backup.rename(directory)
-                raise
-    finally:
-        lock.rmdir()
 
 
 def main():
