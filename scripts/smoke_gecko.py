@@ -107,6 +107,21 @@ def main():
             ):
                 time.sleep(0.2)
             assert "Registrar Firefox" in driver.find_element("css selector", "body").text
+            assert (
+                "Necesitas instalar Lector Local"
+                in driver.find_element("css selector", "body").text
+            )
+            release_url = (
+                "https://github.com/PabloAraujoFIC/lector-local/releases/tag/v"
+                + json.loads((root / "package.json").read_text())["version"]
+            )
+            download = driver.find_element("css selector", ".download-button")
+            assert download.text == "Descargar aplicación"
+            assert download.get_attribute("href") == release_url
+            assert (
+                driver.find_element("css selector", ".installation-link").get_attribute("href")
+                == release_url
+            )
             subprocess.run(
                 [
                     sys.executable,
@@ -122,7 +137,7 @@ def main():
                 env=os.environ | {"HOME": str(home)},
                 check=True,
             )
-            driver.find_element("xpath", "//button[text()='Reintentar conexión']").click()
+            driver.find_element("xpath", "//button[text()='Ya la instalé — reintentar']").click()
             deadline = time.monotonic() + 15
             while (
                 "Conectado" not in driver.find_element("css selector", "body").text
@@ -131,6 +146,10 @@ def main():
             ) and time.monotonic() < deadline:
                 time.sleep(0.2)
             assert "Conectado" in driver.find_element("css selector", "body").text
+            assert (
+                "Necesitas instalar Lector Local"
+                not in driver.find_element("css selector", "body").text
+            )
             assert (
                 "No se encuentra el motor local"
                 not in driver.find_element("css selector", "body").text
@@ -153,6 +172,8 @@ def main():
                 "temporary production extension loaded",
                 "real popup connected",
                 "missing native host shows registration instructions",
+                "missing host offers download, release instructions and retry",
+                "installation panel disappears after successful retry",
                 "production installer registers host for Zen",
                 "popup retry connects after registration without browser restart",
                 "native messaging state/settings roundtrip",

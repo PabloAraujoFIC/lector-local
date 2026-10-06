@@ -49,6 +49,30 @@ try {
   await page.goto(`chrome-extension://${id}/popup.html`);
   const missing = await send(page, "state");
   if (missing.success !== false) throw new Error("Missing host not detected");
+  const version = JSON.parse(
+    await readFile(path.join(root, "package.json"), "utf8"),
+  ).version;
+  const releaseURL = `https://github.com/PabloAraujoFIC/lector-local/releases/tag/v${version}`;
+  await page
+    .getByRole("heading", { name: "Necesitas instalar Lector Local" })
+    .waitFor();
+  if (
+    (await page.locator(".download-button").getAttribute("href")) !==
+      releaseURL ||
+    (await page.locator(".installation-link").getAttribute("href")) !==
+      releaseURL
+  )
+    throw new Error("Incorrect installation release URL");
+  await context.route(releaseURL, (route) =>
+    route.fulfill({ status: 200, body: "Release installation instructions" }),
+  );
+  const openedTab = context.waitForEvent("page");
+  await page
+    .getByRole("link", { name: "Descargar aplicación", exact: true })
+    .click();
+  const downloadTab = await openedTab;
+  await downloadTab.waitForURL(releaseURL);
+  await downloadTab.close();
   const host = path.join(home, "lector-host");
   await writeFile(
     host,
@@ -74,6 +98,12 @@ try {
     );
   }
   await page.waitForTimeout(1000);
+  await page
+    .getByRole("button", { name: "Ya la instalé — reintentar", exact: true })
+    .click();
+  await page.getByText("Conectado", { exact: true }).waitFor();
+  if (await page.locator(".installation-panel").count())
+    throw new Error("Installation panel remains after connection");
   const connected = await send(page, "state");
   if (!connected.success) throw new Error(JSON.stringify(connected));
   const updated = await send(page, "settings", { values: { speed: 1.15 } });
@@ -102,6 +132,8 @@ try {
     checks: [
       "production extension loaded",
       "missing host error",
+      "missing host installation panel and release link opens a new tab",
+      "retry button connects and hides installation panel",
       "real Native Messaging to packaged runtime",
       "settings roundtrip",
       "popup rendered without page errors",

@@ -66,3 +66,39 @@ body {
 .popup-language select {
   font-size: 11px;
 }
+.installation-panel {
+  margin-top: 18px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.installation-panel h3 {
+  margin: 0 0 10px;
+  font-size: 16px;
+}
+.installation-panel p {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.download-button {
+  display: block;
+  padding: 10px;
+  border-radius: 6px;
+  background: var(--accent);
+  color: var(--bg, #151a16);
+  text-align: center;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+}
+.installation-link {
+  display: block;
+  margin-top: 10px;
+  font-size: 11px;
+  color: var(--accent);
+}
+.installation-panel button {
+  width: 100%;
+  font-size: 12px;
+}

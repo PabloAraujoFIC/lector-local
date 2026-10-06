@@ -11,6 +11,7 @@ const HOST = __NATIVE_HOST__;
 let port: ReturnType<typeof browser.runtime.connectNative> | null = null;
 let state: State | null = null;
 let lastError = "";
+let hostMissing = false;
 let activeTab: number | undefined;
 let readingDocument: string | undefined;
 const pendingSpeak = new Set<string>();
@@ -53,6 +54,7 @@ function connect() {
     if (response.payload && "status" in response.payload) {
       state = response.payload;
       lastError = "";
+      hostMissing = false;
       void browser.action.setBadgeText({ text: "" });
     }
     if (state && activeTab != null) {
@@ -81,12 +83,13 @@ function connect() {
       nativePort.error?.message ??
       browser.runtime.lastError?.message ??
       "Host local desconectado. Instala o registra Lector Local.";
-    lastError =
+    hostMissing =
       /No such native application|Specified native messaging host not found/i.test(
         detail,
-      )
-        ? "No se encuentra el motor local de Lector Local. Abre la aplicación de escritorio → Ajustes → Escucha desde tu navegador y registra el host. En Zen usa Registrar Firefox. Después pulsa Reintentar conexión."
-        : detail;
+      );
+    lastError = hostMissing
+      ? "No se encuentra el motor local de Lector Local. Abre la aplicación de escritorio → Ajustes → Escucha desde tu navegador y registra el host. En Zen usa Registrar Firefox. Después pulsa Reintentar conexión."
+      : detail;
     port = null;
     state = null;
     readingDocument = undefined;
@@ -232,7 +235,12 @@ browser.runtime.onMessage.addListener(
         );
       }
       if (msg.kind === "status")
-        return { state, connected: port !== null, error: lastError };
+        return {
+          state,
+          connected: port !== null && state !== null,
+          error: lastError,
+          hostMissing,
+        };
       if (msg.kind === "request" && msg.request) {
         if (
           ![
